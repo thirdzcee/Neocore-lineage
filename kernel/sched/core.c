@@ -147,6 +147,38 @@ void su_exit(void)
 	atomic_dec(&__su_instances);
 }
 
+const char *task_event_names[] = {"PUT_PREV_TASK", "PICK_NEXT_TASK",
+				  "TASK_WAKE", "TASK_MIGRATE", "TASK_UPDATE",
+				"IRQ_UPDATE"};
+
+const char *migrate_type_names[] = {"GROUP_TO_RQ", "RQ_TO_GROUP",
+					 "RQ_TO_RQ", "GROUP_TO_GROUP"};
+
+ATOMIC_NOTIFIER_HEAD(migration_notifier_head);
+ATOMIC_NOTIFIER_HEAD(load_alert_notifier_head);
+
+void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
+{
+	unsigned long delta;
+	ktime_t soft, hard, now;
+
+	for (;;) {
+		if (hrtimer_active(period_timer))
+			break;
+
+		now = hrtimer_cb_get_time(period_timer);
+		hrtimer_forward(period_timer, now, period);
+
+		soft = hrtimer_get_softexpires(period_timer);
+		hard = hrtimer_get_expires(period_timer);
+		delta = ktime_to_ns(ktime_sub(hard, soft));
+		__hrtimer_start_range_ns(period_timer, soft, delta,
+					 HRTIMER_MODE_ABS_PINNED, 0);
+	}
+}
+
+static bool have_sched_energy_data(void);
+
 DEFINE_MUTEX(sched_domains_mutex);
 DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 
@@ -249,6 +281,10 @@ static int sched_feat_set(char *cmp)
 				sysctl_sched_features &= ~(1UL << i);
 				sched_feat_disable(i);
 			} else {
+				if (i == __SCHED_FEAT_ENERGY_AWARE)
+					WARN(!have_sched_energy_data(),
+					     "Missing sched energy data\n");
+
 				sysctl_sched_features |= (1UL << i);
 				sched_feat_enable(i);
 			}
@@ -6510,6 +6546,19 @@ static void init_sched_groups_capacity(int cpu, struct sched_domain *sd)
 	atomic_set(&sg->sgc->nr_busy_cpus, sg->group_weight);
 }
 
+static bool have_sched_energy_data(void)
+{
+	int cpu;
+
+	for_each_possible_cpu(cpu) {
+		if (!rcu_dereference(per_cpu(sd_scs, cpu)) ||
+		    !rcu_dereference(per_cpu(sd_ea, cpu)))
+			return false;
+	}
+
+	return true;
+}
+
 /*
  * Check that the per-cpu provided sd energy data is consistent for all cpus
  * within the mask.
@@ -7262,6 +7311,9 @@ static int build_sched_domains(const struct cpumask *cpu_map,
 		cpu_attach_domain(sd, d.rd, i);
 	}
 	rcu_read_unlock();
+
+	WARN(sched_feat(ENERGY_AWARE) && !have_sched_energy_data(),
+	     "Missing data for energy aware scheduling\n");
 
 	ret = 0;
 error:
