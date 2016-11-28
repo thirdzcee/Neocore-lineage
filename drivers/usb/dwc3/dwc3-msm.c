@@ -104,6 +104,11 @@ static int firstboot_check = 1;
 /* AHB2PHY read/write waite value */
 #define ONE_READ_WRITE_WAIT 0x11
 
+/* force high current otg */
+static bool highcurrent_otg = 0;
+module_param(highcurrent_otg, bool, S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(highcurrent_otg, "force high current charge with otg accessory");
+
 /* cpu to fix usb interrupt */
 static int cpu_to_affin;
 module_param(cpu_to_affin, int, S_IRUGO|S_IWUSR);
