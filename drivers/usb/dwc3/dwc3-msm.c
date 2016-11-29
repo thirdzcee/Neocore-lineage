@@ -5038,11 +5038,27 @@ skip_psy_type:
 #endif
 	if (mdwc->max_power == mA)
 		return 0;
-
+	
+	//Set high current otg current limit 
+	if (highcurrent_otg)
+		mA = DWC3_IDEV_CHG_MAX;
+	
 	dev_info(mdwc->dev, "Avail curr from USB = %u\n", mA);
 	
-	if(highcurrent_otg)
-		mA = DWC3_IDEV_CHG_MAX;
+	//Force high current otg charging for type-c docks
+	if (highcurrent_otg) {
+				
+		/* Enable Charging */
+		if (power_supply_set_online(&mdwc->usb_psy, true))
+			goto psy_error;
+		if (power_supply_set_current_limit(&mdwc->usb_psy, 1000*mA))
+			goto psy_error;
+		
+		power_supply_changed(&mdwc->usb_psy);
+	        mdwc->max_power = mA;
+		
+	      return 0;
+	}	
 	
 	if (mdwc->max_power <= 2 && mA > 2) {
 		/* Enable Charging */
