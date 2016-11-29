@@ -5025,6 +5025,7 @@ skip_psy_type:
 	/* Override mA if type-c charger used (use hvdcp/bc1.2 if it is 500) */
 	if (mdwc->typec_current_max > 500 && mA < mdwc->typec_current_max)
 		mA = mdwc->typec_current_max;
+	
 
 #ifdef CONFIG_LGE_USB_COMPLIANCE_TEST
 	/* add current margin */
@@ -5039,7 +5040,10 @@ skip_psy_type:
 		return 0;
 
 	dev_info(mdwc->dev, "Avail curr from USB = %u\n", mA);
-
+	
+	if(highcurrent_otg)
+		mA = DWC3_IDEV_CHG_MAX;
+	
 	if (mdwc->max_power <= 2 && mA > 2) {
 		/* Enable Charging */
 		if (power_supply_set_online(&mdwc->usb_psy, true))
