@@ -1082,7 +1082,7 @@ static int __apply_to_new_mapping(struct seq_file *s,
 	struct dma_iommu_mapping *mapping;
 	struct iommu_debug_device *ddev = s->private;
 	struct device *dev = ddev->dev;
-	int ret = -EINVAL, fast = 1;
+	int ret = 0, fast = 1;
 	phys_addr_t pt_phys;
 
 	mapping = arm_iommu_create_mapping(&platform_bus_type, 0, SZ_1G * 4UL);
@@ -1477,7 +1477,7 @@ static ssize_t iommu_debug_unmap_write(struct file *file,
 				       const char __user *ubuf,
 				       size_t count, loff_t *offset)
 {
-	ssize_t retval;
+	ssize_t retval = -EINVAL;
 	char *comma1;
 	char buf[100];
 	dma_addr_t iova;

@@ -330,7 +330,7 @@ int ipa2_mhi_resume_channels_internal(enum ipa_client_type client,
 	IPA_MHI_FUNC_ENTRY();
 	res = ipa_uc_mhi_resume_channel(index, LPTransitionRejected);
 	if (res) {
-		IPA_MHI_ERR("failed to suspend channel %u error %d\n",
+		IPA_MHI_ERR("failed to suspend channel %d error %d\n",
 			index, res);
 		return res;
 	}
