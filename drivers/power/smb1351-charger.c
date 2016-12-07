@@ -2782,11 +2782,7 @@ static void smb1351_chg_ctrl_in_jeita(struct smb1351_charger *chip)
 static void smb1351_chg_adc_notification(enum qpnp_tm_state state, void *ctx)
 {
 	struct smb1351_charger *chip = ctx;
-#ifdef CONFIG_LGE_PM
 	struct battery_status *cur = NULL;
-#else
-	struct battery_status *cur;
-#endif
 	int temp;
 
 	if (state >= ADC_TM_STATE_NUM) {
@@ -2885,12 +2881,12 @@ static void smb1351_chg_adc_notification(enum qpnp_tm_state state, void *ctx)
 				chip->batt_hot_decidegc + HYSTERESIS_DECIDEGC;
 		}
 	}
-#ifdef CONFIG_LGE_PM
+
 	if (!cur) {
-		pr_err("no new status with state:%d,temp:%d\n", state,temp);
+		pr_err("invalid transaction: state %d, temp %d\n", state, temp);
 		return;
 	}
-#endif
+
 	if (cur->batt_present)
 		chip->battery_missing = false;
 	else

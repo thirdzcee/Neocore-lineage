@@ -786,7 +786,7 @@ int mdss_mdp_irq_enable(u32 intr_type, u32 intf_num)
 #if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
 	int irq_idx = 0;
 #else
-	int irq_idx, idx;
+	int irq_idx;
 #endif
 	unsigned long irq_flags;
 	int ret = 0;
@@ -810,7 +810,7 @@ int mdss_mdp_irq_enable(u32 intr_type, u32 intf_num)
 				irq.irq_mask, mdata->mdp_irq_mask[irq.reg_idx]);
 #else
 		pr_warn("MDSS MDP IRQ-0x%x is already set, mask=%x\n",
-				irq.irq_mask, mdata->mdp_irq_mask[idx]);
+				irq.irq_mask, mdata->mdp_irq_mask[irq.reg_idx]);
 #endif
 		ret = -EBUSY;
 	} else {
