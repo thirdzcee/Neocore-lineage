@@ -739,10 +739,9 @@ module_param_named(
 	int, S_IRUSR | S_IWUSR
 );
 
-static bool force_highcurrent = 0;
-module_param_named(force_highcurrent, force_highcurrent, 
-                   bool, S_IRUSR | S_IWUSR
-);
+static int force_current = 1;
+module_param(force_current, int, S_IRUSR | S_IWUSR);
+
 
 #define pr_smb(reason, fmt, ...)				\
 	do {							\
@@ -2312,9 +2311,18 @@ static int smbchg_set_usb_current_max(struct smbchg_chip *chip,
 				(chip->wa_flags & SMBCHG_USB100_WA))
 			current_ma = CURRENT_150_MA;
 
-		
-                if (force_highcurrent)
+		/*current overrides for docks*/
+                if (force_current == 1500)
                     current_ma = CURRENT_1500_MA;
+                
+                if (force_current == 900)
+                    current_ma = CURRENT_900_MA;
+                
+                if (force_current == 500)
+                    current_ma = CURRENT_500_MA;
+    
+                if (force_current > 0)
+                    pr_smb(PR_STATUS, "force_current set to %dmA, attempting to set.", current_ma);
 
                 /* handle special SDP case when USB reports high current */
 		if (current_ma > CURRENT_900_MA) {
