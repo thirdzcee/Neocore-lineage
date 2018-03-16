@@ -108,18 +108,23 @@
 static int prev_blank_mode;
 #endif
 
+/* A rewritten backlight dimmer function
+ * My discoveries are that android operates on values between 16-4095
+ * To scale it nicely use android's value as a growth factor and multiply it by panel max brightness (4095 on all)
+ * So it goes like this: (value-15)/(4095-15)*4095
+ * BUT - it has to be changed a bit to match non-floating point registers rule
+ * Work done by @xNombre
+ */
 #define MDSS_BRIGHT_TO_BL_DIM(out, v) do {\
-			out = (12*v*v+1393*v+3060)/4465;\
-			} while (0)
+		out = ((v-15)*4095/4080);\
+		} while (0)
 
 bool backlight_dimmer = false;
-module_param(backlight_dimmer, bool, 0755);
-
-int backlight_min = 0;
-int backlight_max = 255;
-
-module_param(backlight_min, int, 0755);
-module_param(backlight_max, int, 0755);
+int backlight_min = 1;
+int backlight_max = 4095;
+module_param(backlight_dimmer, bool, 0644);
+module_param(backlight_min, int, 0644);
+module_param(backlight_max, int, 0644);
 
 static struct fb_info *fbi_list[MAX_FBI_LIST];
 static int fbi_list_index;
@@ -404,15 +409,6 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
 
-	// Boeffla: apply min/max limits for LCD backlight (0 is exception for display off)
-	if (value != 0) {
-		if (value < backlight_min)
-			value = backlight_min;
-
-		if (value > backlight_max)
-			value = backlight_max;
-	}
-
 	if (backlight_dimmer) {
 		MDSS_BRIGHT_TO_BL_DIM(bl_lvl, value);
 	} else {
@@ -420,6 +416,21 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 		   driver backlight level 0 to bl_max with rounding */
 		MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
 					mfd->panel_info->brightness_max);
+	}
+
+	if (bl_lvl != 0)
+	{
+		/* sanitize */
+		if (backlight_min < 1)
+			backlight_min = 1;
+		if (backlight_max > 4095)
+			backlight_max= 4095;
+
+		/* set limits */
+		if (bl_lvl < backlight_min)
+			bl_lvl = backlight_min;
+		if (bl_lvl > backlight_max)
+			bl_lvl = backlight_max;
 	}
 
 	if (!bl_lvl && value)
