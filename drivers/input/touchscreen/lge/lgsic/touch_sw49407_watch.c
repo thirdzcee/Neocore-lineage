@@ -641,7 +641,7 @@ static int ext_watch_font_dump(struct device *dev, char *font_dump)
     value = 1;
     ret = sw49407_reg_write(dev, EXT_WATCH_FONT_DN_FLAG,
         (u8*)&value, sizeof(u32));
-    if (ret)
+	if (ret)
         goto error;
 
 	remained = d->watch.font_written_size;
