@@ -103,3 +103,4 @@ android/configs/android-*.cfg
 #stuff
 /build
 /zip
+/net/wireguard
