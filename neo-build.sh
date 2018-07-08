@@ -23,7 +23,7 @@ fi
 
 echo "setting up build..."
 mkdir "$BUILD"
-make O="$BUILD" lineageos_h990_defconfig
+make O="$BUILD" neo_defconfig
 
 echo "building kernel..."
 time make O="$BUILD" -j$NPR 2>&1 |tee ../compile.log
