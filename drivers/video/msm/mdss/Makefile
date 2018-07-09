@@ -1,3 +1,5 @@
+EXTRA_CFLAGS += -O3
+
 ccflags-y += -I$(src)
 
 obj-$(CONFIG_LGE_DISPLAY_COMMON) += lge/

@@ -4,6 +4,8 @@
 
 # Each configuration option enables a list of files.
 
+EXTRA_CFLAGS += -O3
+
 obj-y				+= core/
 
 obj-$(CONFIG_EXYNOS_VIDEO)     += exynos/

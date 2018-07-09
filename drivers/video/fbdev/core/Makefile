@@ -1,3 +1,5 @@
+EXTRA_CFLAGS += -O3
+
 obj-y                             += fb_notify.o
 obj-$(CONFIG_FB_CMDLINE)          += fb_cmdline.o
 obj-$(CONFIG_FB)                  += fb.o

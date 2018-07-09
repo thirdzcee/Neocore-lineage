@@ -2,6 +2,8 @@
 # Makefile for the video capture/playback device drivers.
 #
 
+EXTRA_CFLAGS += -O3
+
 obj-$(CONFIG_VIDEO_VINO) += indycam.o
 obj-$(CONFIG_VIDEO_VINO) += vino.o
 

@@ -2,6 +2,8 @@
 # Makefile for the kernel block layer
 #
 
+EXTRA_CFLAGS += -O3
+
 obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o \
 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
 			blk-exec.o blk-merge.o blk-softirq.o blk-timeout.o \
