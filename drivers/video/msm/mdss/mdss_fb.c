@@ -120,7 +120,7 @@ static int prev_blank_mode;
 		} while (0)
 
 bool backlight_dimmer = false;
-int backlight_min = 1;
+int backlight_min = 2;
 int backlight_max = 4095;
 module_param(backlight_dimmer, bool, 0644);
 module_param(backlight_min, int, 0644);
