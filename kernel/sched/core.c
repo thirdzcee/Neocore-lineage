@@ -95,15 +95,6 @@
 #include <trace/events/sched.h>
 #include "walt.h"
 
-void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
-{
-	if (hrtimer_active(period_timer))
-		return;
-
-	hrtimer_forward_now(period_timer, period);
-	hrtimer_start_expires(period_timer, HRTIMER_MODE_ABS_PINNED);
-}
-
 static atomic_t __su_instances;
 
 int su_instances(void)
