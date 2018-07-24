@@ -2081,7 +2081,8 @@ void cpuset_fork(struct task_struct *task)
 	task->mems_allowed = current->mems_allowed;
 }
 
-static int cpuset_allow_attach(struct cgroup_subsys_state *css,
+// I'll leave this out for now
+/*static int cpuset_allow_attach(struct cgroup_subsys_state *css,
 			       struct cgroup_taskset *tset)
 {
 	const struct cred *cred = current_cred(), *tcred;
@@ -2096,7 +2097,7 @@ static int cpuset_allow_attach(struct cgroup_subsys_state *css,
 	}
 
 	return 0;
-}
+}*/
 
 struct cgroup_subsys cpuset_cgrp_subsys = {
 	.css_alloc	= cpuset_css_alloc,
