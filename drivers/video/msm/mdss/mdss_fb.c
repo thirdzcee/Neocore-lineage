@@ -120,7 +120,7 @@ static int prev_blank_mode;
 		} while (0)
 
 bool backlight_dimmer = false;
-int backlight_min = 2;
+int backlight_min = 10
 int backlight_max = 4465;
 module_param(backlight_dimmer, bool, 0644);
 module_param(backlight_min, int, 0644);
@@ -281,7 +281,7 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 		mutex_unlock(&mfd->update.lock);
 		ret = wait_for_completion_interruptible_timeout(
 						&mfd->update.comp,
-						msecs_to_jiffies(4000));
+						msecs_to_jiffies(1200));
 		mutex_lock(&mfd->update.lock);
 		mfd->update.ref_count--;
 		mutex_unlock(&mfd->update.lock);
@@ -303,7 +303,7 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 		mutex_unlock(&mfd->no_update.lock);
 		ret = wait_for_completion_interruptible_timeout(
 						&mfd->no_update.comp,
-						msecs_to_jiffies(4000));
+						msecs_to_jiffies(1200));
 		mutex_lock(&mfd->no_update.lock);
 		mfd->no_update.ref_count--;
 		mutex_unlock(&mfd->no_update.lock);
@@ -313,7 +313,7 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 			reinit_completion(&mfd->power_off_comp);
 			ret = wait_for_completion_interruptible_timeout(
 						&mfd->power_off_comp,
-						msecs_to_jiffies(1000));
+						msecs_to_jiffies(300));
 		}
 	}
 

@@ -67,7 +67,7 @@
 
 #define IPA_MAX_NUM_REQ_CACHE 10
 
-#define IPA_TIMEOUT(value) (msecs_to_jiffies(value * 1000))
+#define IPA_TIMEOUT(value) (msecs_to_jiffies(value * 300))
 
 #define IPADBG(fmt, args...) \
 	do { \

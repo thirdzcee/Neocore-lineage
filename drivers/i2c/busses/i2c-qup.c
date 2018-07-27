@@ -227,7 +227,7 @@ static int qup_i2c_wait_writeready(struct qup_i2c_dev *qup)
 	u32 opflags;
 	u32 status;
 
-	timeout = jiffies + 1000;
+	timeout = jiffies + 300;
 
 	for (;;) {
 		opflags = readl(qup->base + QUP_OPERATIONAL);

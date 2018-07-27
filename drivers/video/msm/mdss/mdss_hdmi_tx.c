@@ -1485,7 +1485,7 @@ static void hdmi_tx_hdcp_cb(void *ptr, enum hdmi_hdcp_state status)
 	hdmi_ctrl->hdcp_status = status;
 
 	queue_delayed_work(hdmi_ctrl->workq, &hdmi_ctrl->hdcp_cb_work,
-						msecs_to_jiffies(250));
+						msecs_to_jiffies(75));
 }
 
 static inline bool hdmi_tx_is_stream_shareable(struct hdmi_tx_ctrl *hdmi_ctrl)
