@@ -38,7 +38,7 @@ mv "$BUILD/arch/arm64/boot/Image.gz-dtb" "$OUT/Image.gz-dtb"
 find "$BUILD/lib/modules/" -name *.ko | xargs -n 1 -I '{}' mv {} "$OUT/modules"
 cd zip
 #mv modules/exfat.ko modules/texfat.ko
-zip -q -r "$ZIPNAME" anykernel.sh META-INF tools modules Image.gz-dtb setfiles.conf ramdisk patch
+zip -q -r "$ZIPNAME" anykernel.sh META-INF tools modules Image.gz-dtb setfiles.conf thermal-engine-8996.conf ramdisk patch
 
 mv "$ZIPNAME" "/home/ironbuang/android/h990/$ZIPNAME"
 
