@@ -4284,7 +4284,9 @@ static int estimate_battery_age(struct fg_chip *chip, int *actual_capacity)
 	}
 
 	battery_soc = get_battery_soc_raw(chip) * 100 / FULL_PERCENT_3B;
-	if (battery_soc < 25 || battery_soc > 75) {
+	if (rc) {
+		goto error_done;
+	} else if (battery_soc < 25 || battery_soc > 75) {
 		if (fg_debug_mask & FG_AGING)
 			pr_info("Battery SoC (%d) out of range, aborting\n",
 				(int)battery_soc);
@@ -10372,7 +10374,7 @@ retry:
 #ifdef CONFIG_LGE_PM
 		pr_err("Digital Major rev=%d not supported\n", chip->revision[DIG_MAJOR]);
 #else
-		pr_err("Digital Major rev=%d not supported\n", chip->revision[DIG_MAJOR]);
+		pr_err("Digital Major rev=%d not supported\n", dig_major);
 #endif
 		return -EINVAL;
 	}
