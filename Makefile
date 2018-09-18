@@ -294,13 +294,10 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
 	  else echo sh; fi ; fi)
 
-GRAPHITE = -fgraphite -fgraphite-identity -floop-interchange -ftree-loop-distribution -floop-strip-mine -floop-block -ftree-loop-linear
-
-
 HOSTCC       = ccache gcc
 HOSTCXX      = ccache g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fno-inline-functions -fno-ipa-cp-clone -fomit-frame-pointer -std=gnu89 $(GRAPHITE) -pipe
-HOSTCXXFLAGS = -Ofast -fno-inline-functions -fno-ipa-cp-clone $(GRAPHITE) -pipe
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
+HOSTCXXFLAGS = -O2
 
 ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
 HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
@@ -385,18 +382,6 @@ AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
 CFLAGS_KCOV	= -fsanitize-coverage=trace-pc
 
-# fall back to -march=armv8-a in case the compiler isn't compatible 
-# with -mcpu and -mtune
-ARM_ARCH_OPT := -mcpu=cortex-a57 -mtune=cortex-a57
-GEN_OPT_FLAGS := $(call cc-option,$(ARM_ARCH_OPT),-march=armv8-a) \
- -g0 \
- -DNDEBUG \
- -fomit-frame-pointer \
- -fmodulo-sched-allow-regmoves \
- -fivopts
-
-# flags to fix module loading issues if incompatible general optimizations are used
-MOD_FIX_FLAGS := -fno-tree-loop-vectorize
 
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE    := \
@@ -417,21 +402,17 @@ LINUXINCLUDE    := \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -Wno-misleading-indentation \
-		   -fno-strict-aliasing -fno-common -Wno-incompatible-pointer-types \
-		   -Werror-implicit-function-declaration -Wno-unused-const-variable \
-		   -Wno-array-bounds -Wno-maybe-uninitialized \
-		   -Wno-format-security -Wno-discarded-array-qualifiers -Wno-memset-transposed-args \
-		   -Wno-bool-compare -Wno-logical-not-parentheses -Wno-switch-bool -Wno-tautological-compare \
-		   -std=gnu89 -std=gnu89 -Wno-format-truncation -Wno-bool-operation -Wno-duplicate-decl-specifier \
-		   -Wno-memset-elt-size -Wno-parentheses -Wno-format-overflow -Wno-int-in-bool-context \
-		   -Wno-switch-unreachable -Wno-stringop-overflow \
-		   $(GEN_OPT_FLAGS)
-KBUILD_AFLAGS_KERNEL := $(GEN_OPT_FLAGS)
-KBUILD_CFLAGS_KERNEL := $(GEN_OPT_FLAGS)
+KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+		   -fno-strict-aliasing -fno-common \
+		   -Werror-implicit-function-declaration \
+		   -Wno-format-security \
+		   -std=gnu89
+
+KBUILD_AFLAGS_KERNEL :=
+KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
-KBUILD_AFLAGS_MODULE  := -DMODULE $(GEN_OPT_FLAGS)
-KBUILD_CFLAGS_MODULE  := -DMODULE $(MOD_FIX_FLAGS) $(GEN_OPT_FLAGS)
+KBUILD_AFLAGS_MODULE  := -DMODULE
+KBUILD_CFLAGS_MODULE  := -DMODULE
 KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
@@ -642,16 +623,13 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
 KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-KBUILD_CFLAGS	+= -Os
+KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 else
-KBUILD_CFLAGS	+= -Ofast -fno-inline-functions -fno-ipa-cp-clone -fno-store-merging
+KBUILD_CFLAGS	+= -O2
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
 KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
-
-# Needed to unbreak GCC 7.x and above
-KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
 
 ifdef CONFIG_READABLE_ASM
 # Disable optimizations that make assembler listings hard to read.
