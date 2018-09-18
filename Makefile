@@ -401,8 +401,8 @@ LDFLAGS_vmlinux	+= $(call ld-option, --no-fix-cortex-a53-835769)
 LDFLAGS_vmlinux	+= $(call ld-option, --no-fix-cortex-a53-843419)
 LDFLAGS_MODULE	+= $(call ld-option, --no-fix-cortex-a53-835769)
 LDFLAGS_MODULE	+= $(call ld-option, --no-fix-cortex-a53-843419)
-LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-835769)
-LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-843419)
+#LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-835769)
+#LDFLAGS		+= $(call ld-option, --no-fix-cortex-a53-843419)
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
