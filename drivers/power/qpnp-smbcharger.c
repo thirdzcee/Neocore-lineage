@@ -739,7 +739,7 @@ module_param_named(
 	int, S_IRUSR | S_IWUSR
 );
 
-static int force_current = 1;
+static int force_current = 1500;
 module_param(force_current, int, S_IRUSR | S_IWUSR);
 
 
